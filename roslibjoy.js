@@ -69,6 +69,26 @@ function publishToROS() {
     console.log('CV CAV : ', CV, CAV);
 
     console.log("cmd_vel ", twist);
+
+/* figure out how to access contents of twist mesg...
+
+   here's what gets spewed from console.log above
+
+cmd_vel  Message {
+  linear: { x: 0.1, y: 0.2, z: 0.3 },
+  angular: { x: -0.1, y: -0.2, z: -0.3 } }
+
+REF: http://iguanatronics.com/simple-tutorial-on-rosbridge-and-roslibjs/
+
+*/
+    console.log("twist.linear.x  : ", twist.linear.x);
+    console.log("twist.angular.z : ", twist.angular.z);
+
+/*
+twist.linear.x  :  0.1
+twist.angular.z :  -0.3
+*/
+ 
     // cmdVel.publish(twist);
 }
 
