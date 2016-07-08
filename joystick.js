@@ -30,6 +30,15 @@ var safety = 'disabled';
 var CV = 0;               // these 2 vars get sampled and published to ros as /cmd_vel message 
 var CAV = 0;              // on a periodic basis... lets use 10hz for now
 
+function publishToROS() {
+
+    console.log('CV CAV : ', CV, CAV);
+
+    // TODO: add code to use roslib to format & publish /cmd_vel to ROS 
+}
+
+setInterval(publishToROS, 1000);  // for debug, publish cmd_vel at rate of 1hz
+
 joystick.on('button', function(event) {
 
 // { time: 17062012, value: 1, number: 13, type: 'button', id: 1 }
@@ -48,7 +57,7 @@ joystick.on('button', function(event) {
 	
 	// pubCMDvel() here
 
-	console.log('safety cv cav ', safety, CV, CAV);
+	//console.log('safety cv cav ', safety, CV, CAV);
     }
 
 });
@@ -70,7 +79,7 @@ joystick.on('axis', function(event) {
 
 	if (event.type === 'axis' && event.number === 3) {
 	    CAV = intToFloat(event.value/32768, 2);
-	    console.log('CAV ', CAV);
+	    //console.log('CAV ', CAV);
 	}
 
 	// Scale Right Joystick Y axis to a -1 < float_ry < +1 
@@ -84,7 +93,7 @@ joystick.on('axis', function(event) {
 
 	if (event.type === 'axis' && event.number === 4) {
 	    CV = intToFloat(event.value/-32768, 2);
-	    console.log(' CV ', CV);
+	    //console.log(' CV ', CV);
 	}
     }
 
