@@ -51,14 +51,14 @@ var cmdVel = new ROSLIB.Topic({
 
 var twist = new ROSLIB.Message({
 linear : {
-  x : 0.1,
-  y : 0.2,
-  z : 0.3
+  x : 0.0,    // linear vel along X axis in meters/sec
+  y : 0.0,
+  z : 0.0
 },
 angular : {
-  x : -0.1,
-  y : -0.2,
-  z : -0.3
+  x : 0.0,
+  y : 0.0,
+  z : 0.0     // angular vel about Z axis in radians/sec
 }
 });
 
@@ -66,29 +66,12 @@ function intToFloat(num, decPlaces) { return num.toFixed(decPlaces); }
 
 function publishToROS() {
 
-    console.log('CV CAV : ', CV, CAV);
+    twist.linear.x = CV;
+    twist.angular.z = CAV;
 
-    console.log("cmd_vel ", twist);
-
-/* figure out how to access contents of twist mesg...
-
-   here's what gets spewed from console.log above
-
-cmd_vel  Message {
-  linear: { x: 0.1, y: 0.2, z: 0.3 },
-  angular: { x: -0.1, y: -0.2, z: -0.3 } }
-
-REF: http://iguanatronics.com/simple-tutorial-on-rosbridge-and-roslibjs/
-
-*/
     console.log("twist.linear.x  : ", twist.linear.x);
     console.log("twist.angular.z : ", twist.angular.z);
 
-/*
-twist.linear.x  :  0.1
-twist.angular.z :  -0.3
-*/
- 
     // cmdVel.publish(twist);
 }
 
