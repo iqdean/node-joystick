@@ -1,0 +1,304 @@
+Simple app to console.log xbox gamecontroller inputs
+----------------------------------------------------
+
+Review basic xbox game controller setup on ubu1404:
+
+---REF: 5-xbox-joystick-on-u1404.txt ---  already done
+
+<2.0> install steamos-xpad-dkms  <- this updates xpad driver 
+                                    so dont need xboxdrv
+
+sudo add-apt-repository ppa:mdeslaur/steamos	ok
+sudo apt-get update				ok
+sudo apt-get install steamos-xpad-dkms		ok
+
+---REF: 5-xbox-joystick-on-u1404.txt ---  already done
+
+$ sudo apt-get install joystick jstest-gtk   < reinstall got removed
+                                               by last 
+					       $ sudo apt-get autoremove
+
+=== BKM xbox360 on ubu1404 ====
+    (after install/setup)
+
+a plug in xbox360 pcwlga, 
+b push green button on xbox360 gamepad,
+  > it associates ok (LEDS go from all 4 spinnning to just 1 on)
+c iqdean@hpdm4:~$ jstest-gtk
+d push buttons and move joysticks ... see results on jstest-gtk ok
+
+==== ok, we got working xbox360 game controller on ubu1404 ====
+
+now see if we can get a node app to console log xbox360 gc inputs ?
+
+--------
+Option 1: more recent, higher number of recent downloads on npm
+-------- 0 open issues on git hub
+
+https://www.npmjs.com/package/xbox-controller-node
+1.6.0 is the latest of 18 releases
+
+>> OPTION 1 - DOESN'T WORK
+
+---------
+Option 2: less recent, lower number of recent downloads on npm
+--------  9 open issues on git hub
+          but really good example.js
+
+https://github.com/andrew/node-xbox-controller
+https://github.com/andrew/node-xbox-controller/blob/master/example.js
+
+>> OPTION 2 - DOESN'T WORK
+
+---------
+OPTION 3: 
+---------
+
+https://www.npmjs.com/package/joystick
+Node.js module for reading joystick data under Linux
+
+AND WE HAVE A WINNER... OPTION 3 works with WIRED XBOX 360 
+
+joystick.js = 3 line Example from https://www.npmjs.com/package/joystick
+-------------
+
+// Set a deadzone of +/-3500 (out of +/-32k) and a sensitivty of 350 to reduce signal noise in joystick axis 
+var joystick = new (require('joystick'))(0, 3500, 350);
+joystick.on('button', console.log);
+joystick.on('axis', console.log);
+
+                                
+iqdean@hpdm4:~/u1404/nodeprojs/4-2-node-joystick$ node joystick.js
+{ time: 26763280,
+  value: 0,
+  number: 0,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 26763304,
+  value: 0,
+  number: 1,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 26763308,
+  value: 0,
+  number: 2,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 26763308,
+  value: 0,
+  number: 3,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 26763308,
+  value: 0,
+  number: 4,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 26763308,
+  value: 0,
+  number: 5,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 26763308,
+  value: 0,
+  number: 6,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 26763308,
+  value: 0,
+  number: 7,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 26763312,
+  value: 0,
+  number: 8,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 26763312,
+  value: 0,
+  number: 9,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 26763312,
+  value: 0,
+  number: 10,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 26763312,
+  value: 0,
+  number: 11,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 26763312,
+  value: 0,
+  number: 12,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 26763312,
+  value: 0,
+  number: 13,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 26763312,
+  value: 0,
+  number: 14,
+  init: true,
+  type: 'button',
+  id: 1 }            ---- [ 0 - 14 button ] ---- 15 buttons
+{ time: 26763316,
+  value: -3794,
+  number: 0,
+  init: true,
+  type: 'axis',
+  id: 1 }
+{ time: 26763316,
+  value: -7383,
+  number: 1,
+  init: true,
+  type: 'axis',
+  id: 1 }
+{ time: 26763316,
+  value: -32767,
+  number: 2,
+  init: true,
+  type: 'axis',
+  id: 1 }
+{ time: 26763316,
+  value: 0,
+  number: 3,
+  init: true,
+  type: 'axis',
+  id: 1 }
+{ time: 26763316,
+  value: 0,
+  number: 4,
+  init: true,
+  type: 'axis',
+  id: 1 }
+{ time: 26763316,
+  value: -32767,
+  number: 5,           ---- [ 0 to 5 axis ] --- 6 axis's
+  init: true,
+  type: 'axis',
+  id: 1 }
+----------- push buttons and see -----------------------------  -- IAD ----
+{ time: 27229592, value: 1, number: 0, type: 'button', id: 1 }  A pushed
+{ time: 27229740, value: 0, number: 0, type: 'button', id: 1 }    released
+
+{ time: 27229916, value: 1, number: 1, type: 'button', id: 1 }  B
+{ time: 27230092, value: 0, number: 1, type: 'button', id: 1 }  
+
+{ time: 27230452, value: 1, number: 2, type: 'button', id: 1 }  X
+{ time: 27230588, value: 0, number: 2, type: 'button', id: 1 }  
+
+{ time: 27230804, value: 1, number: 3, type: 'button', id: 1 }  Y
+{ time: 27231020, value: 0, number: 3, type: 'button', id: 1 }  
+
+{ time: 27388336, value: 1, number: 4, type: 'button', id: 1 }  LB (Left Brake)
+{ time: 27388480, value: 0, number: 4, type: 'button', id: 1 }
+
+{ time: 27425184, value: 1, number: 5, type: 'button', id: 1 }  RB (Right Brake)
+{ time: 27425312, value: 0, number: 5, type: 'button', id: 1 }
+
+{ time: 27467456, value: 1, number: 6, type: 'button', id: 1 }  < Back
+{ time: 27467672, value: 0, number: 6, type: 'button', id: 1 }
+
+{ time: 27531392, value: 1, number: 7, type: 'button', id: 1 }  > Start
+{ time: 27531752, value: 0, number: 7, type: 'button', id: 1 }
+
+{ time: 27643472, value: 1, number: 8, type: 'button', id: 1 } X button
+{ time: 27643744, value: 0, number: 8, type: 'button', id: 1 }
+
+{ time: 29415728, value: 1, number: 9, type: 'button', id: 1 } Left Stick Push
+{ time: 29417348, value: 0, number: 9, type: 'button', id: 1 }            Release
+
+{ time: 29531852, value: 1, number: 10, type: 'button', id: 1 } Right Stick Push
+{ time: 29532564, value: 0, number: 10, type: 'button', id: 1 }             Release
+
+{ time: 27777816, value: 1, number: 11, type: 'button', id: 1 } + left DPAD
+{ time: 27777920, value: 0, number: 11, type: 'button', id: 1 }
+
+{ time: 27800344, value: 1, number: 12, type: 'button', id: 1 } + right DPAD
+{ time: 27800528, value: 0, number: 12, type: 'button', id: 1 }
+
+{ time: 27875868, value: 1, number: 13, type: 'button', id: 1 } + up DPAD
+{ time: 27875972, value: 0, number: 13, type: 'button', id: 1 }
+
+{ time: 27875868, value: 1, number: 13, type: 'button', id: 1 } + down DPAD
+{ time: 27875972, value: 0, number: 13, type: 'button', id: 1 }
+
+{ time: 28139332, value: -3794, number: 0, type: 'axis', id: 1 }  Left Stick  X
+{ time: 28139340, value: -5174, number: 1, type: 'axis', id: 1 }              Y
+
+              axis 1
+
+             -32767  full up
+                
+               -5k
+              
+ -32767         0          +32767   <--- axis 0 --->
+ full left               full right 
+               +5k
+
+             +32767 full down
+
+{ time: 28215196, value: 0,    number: 2, type: 'axis', id: 1 }   Left Throttle
+{ time: 28215204, value: 8514, number: 2, type: 'axis', id: 1 }
+
+{ time: 28399172, value: 15793, number: 3, type: 'axis', id: 1 }  Right stick  X
+{ time: 28399172, value: 11893, number: 4, type: 'axis', id: 1 }               Y
+
+              axis 4
+
+             -32767  full up
+                
+              -3500k
+              
+ -32767         0          +32767   <--- axis 3 --->
+ full left               full right 
+              +3500k
+
+             +32767 full down
+
+
+
+{ time: 28579560, value: -25286, number: 5, type: 'axis', id: 1 } Right Throttle
+{ time: 28579568, value: -32767, number: 5, type: 'axis', id: 1 }
+
+
+/home/iqdean/u1404/nodeprojs/4-2-node-joystick:
+  total used in directory 21 available 437740708
+  drwxrwxrwx 1 root root 4096 Jul  7 23:56 .
+  drwxrwxrwx 1 root root 4096 Jul  6 21:38 ..
+  drwxrwxrwx 1 root root 4096 Jul  8 00:00 .git
+  -rwxrwxrwx 1 root root 3082 Jul  7 18:56 joystick.js
+  -rwxrwxrwx 1 root root  237 Jul  6 21:41 joystick.js~
+  drwxrwxrwx 1 root root    0 Jul  7 20:34 node_modules
+  -rwxrwxrwx 1 root root 3846 Jul  7 23:56 roslibjoy.js
+
+
+
+
+
+
+
+
+
+
+
+
+

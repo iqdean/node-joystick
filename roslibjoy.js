@@ -1,14 +1,23 @@
-// 1 joystick.js
-//   $ npm install joystick
-// Set a deadzone of +/-3500 (out of +/-32k) and a sensitivty of 350 to reduce signal noise in joystick axis 
+// REFS:
 
-// 2 [IAD] 
-// REF: /home/iqdean/u1404/intel-edison/8-5-node-xbox-gamepad.txt
-//            for xbox360 Game Controller button/joystick mappings
+// joystick.js = Node.js module for reading joystick data under Linux
+// [1] https://github.com/nodebits/linux-joystick
+// [2] https://github.com/JayBeavers/node-joystick
+// [3] https://www.npmjs.com/package/joystick
+
+// xbox360 Game Controller button/joystick mappings using joystick.js
+// [4] /home/iqdean/u1404/intel-edison/8-5-node-xbox-gamepad.txt
+
+
+// [1] joystick.js
+//   $ npm install joystick
+//     Set a deadzone of +/-3500 (out of +/-32k) and a sensitivty of 350 to reduce signal noise in joystick axis 
+
+// [4] xbox360 GC Mappings 
 //
 // Current Usage 
 //
-// Saftey Button - DPAD Up Button - HOLD PUSHED TO DRIVE
+// Saftey Button - DPAD Up Button 13 - HOLD PUSHED TO DRIVE
 // { time: 16346348, value: 0, number: 13, type: 'button', id: 1 }
 //                    |
 //                    |   safety    throttle
@@ -16,12 +25,14 @@
 //                    1 - disabled  enabled  ( push and hold pushed to enable the throttle)
 //
 // Throttle - Right JoyStick
-//  
-//                 +1 Full Fwd
 // 
-//   Full Lft -1    +   +1 Full Rt 
-//
-//                 -1 Full Rev
+//                 +1 Full Fwd  -32767
+//                                                       up
+//                                   left       right     |
+//   Full Lft -1    +   +1 Full Rt   <-- axis 3 -->     axis 4
+//   -32767                +32767                         |
+//                                                       down
+//                 -1 Full Rev  +32767
 
 // 3 [IAD] roslibjoy.js = 3-node-roslib-example/node-simple.js + 4-2-node-joystick/joystick.js
 //   Add roslib to joystick.js to publish /cmd_vel thru roslib to robot running rosbridge-server
