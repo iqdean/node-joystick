@@ -62,7 +62,24 @@ AND WE HAVE A WINNER... OPTION 3 works with WIRED XBOX 360
 joystick.js = 3 line Example from https://www.npmjs.com/package/joystick
 -------------
 
-// Set a deadzone of +/-3500 (out of +/-32k) and a sensitivty of 350 to reduce signal noise in joystick axis 
+// id
+// with steamos xpad driver installed
+// hp dm4  xbox360 shows up on id 1 (/dev/input/js1)
+// ac720   xbox360 shows up on id 0 (/dev/input/js0)
+
+// deadzone
+// Set a deadzone of +/-3500 (out of +/-32k)
+ 
+// sensitivity 
+// Set a sensitivty of 350 to reduce signal noise in joystick axis 
+
+//                                      id deadzone sensitivity
+//                                       |   |     /
+var joystick = new (require('joystick'))(1, 3500, 350);
+
+joystick.on('button', console.log);
+joystick.on('axis', console.log);
+
 var joystick = new (require('joystick'))(0, 3500, 350);
 joystick.on('button', console.log);
 joystick.on('axis', console.log);
@@ -291,14 +308,301 @@ iqdean@hpdm4:~/u1404/nodeprojs/4-2-node-joystick$ node joystick.js
   -rwxrwxrwx 1 root root 3846 Jul  7 23:56 roslibjoy.js
 
 
+8-29-2016 Update
+----------------
+                                            using roslibjoy.js
+--- Wired XBOX360 Gamepad on HP DM4 --- ... the 'safety' button 13 doesn't work?
+
+    shows up as "Logic 3 Controller" so it's a microsoft xbox360 GC knock off 
+    bought from GameStop
+
+--- run joystick.js --- & see that the Wired XBOX360 Gamepad doesn't have button 13
+                          it only has 11 buttons (0-10)
+
+// with steamos xpad driver installed
+// hp dm4  xbox360 shows up on id 1 (/dev/input/js1)
+// ac720   xbox360 shows up on id 0 (/dev/input/js0)
+//                                       id -deadzone-
+var joystick = new (require('joystick'))(1, 3500, 350);
+joystick.on('button', console.log);
+joystick.on('axis', console.log);
+
+---
+
+iqdean@hpdm4:~/u1404/DEV-SW/github/node-joystick$ node joystick.js
+{ time: 6029536,
+  value: 0,
+  number: 0,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 6029564,
+  value: 0,
+  number: 1,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 6029564,
+  value: 0,
+  number: 2,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 6029564,
+  value: 0,
+  number: 3,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 6029564,
+  value: 0,
+  number: 4,           LB (Left Brake)
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 6029564,
+  value: 0,
+  number: 5,          RB (Right Brake)
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 6029564,
+  value: 0,
+  number: 6,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 6029564,
+  value: 0,
+  number: 7,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 6029568,
+  value: 0,
+  number: 8,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 6029568,
+  value: 0,
+  number: 9,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 6029568,
+  value: 0,
+  number: 10,           --- [0 - 10] 11 'buttons' ---
+  init: true,
+  type: 'button',
+  id: 1 }
+
+{ time: 6029568,
+  value: 0,                          -32767  0   +32767
+  number: 0,           Lft Joystick  Lft <-------> Rt
+  init: true,
+  type: 'axis',
+  id: 1 }
+{ time: 6029568,
+  value: 0,                        -32767   0   +32669
+  number: 1,           Lft Joystick  Up <------> Down
+  init: true,
+  type: 'axis',
+  id: 1 }
+{ time: 6029568,
+  value: -32767,                   -32767  0   +32767
+  number: 2,	      Lft Throttle  0 --------> 100%  
+  init: true,
+  type: 'axis',
+  id: 1 }
+{ time: 6029572,
+  value: 0,                          -32460       +32767
+  number: 3,              Rt JoyStick  Lft <-----> Rt
+  init: true,
+  type: 'axis',
+  id: 1 }
+{ time: 6029572,
+  value: 0,                         -32460      32767
+  number: 4,              Rt Joystick Up <-----> Down
+  init: true,
+  type: 'axis',
+  id: 1 }
+{ time: 6029572,
+  value: -32767,                -32767  0     32767
+  number: 5,           Rt Throttle 0 --------> 100%
+  init: true,
+  type: 'axis',
+  id: 1 }
+{ time: 6029572,
+  value: 0,                    -32767 0  +32767  <- tristate, not linear
+  number: 6,             DPAD  Lft <----> Rt
+  init: true,
+  type: 'axis',
+  id: 1 }
+{ time: 6029572,
+  value: 0,                  -32767 0   +32767   <- tristate, not linear
+  number: 7,             DPAD Up <-----> Down
+  init: true,
+  type: 'axis',
+  id: 1 }
+-------------------[0-7] axis = 8 axis's -------------------------
+
+{ time: 1090620, value: -32767, number: 7, type: 'axis', id: 1 }   DPAD Up - push
+{ time: 1090892, value: 0, number: 7, type: 'axis', id: 1 }                - rls
+
+{ time: 1100988, value: 32767, number: 7, type: 'axis', id: 1 }    DPAD Dwn - push
+{ time: 1101148, value: 0, number: 7, type: 'axis', id: 1 }                 - rls
+
+{ time: 1104500, value: -32767, number: 6, type: 'axis', id: 1 }   DPAD lft - push
+{ time: 1104688, value: 0, number: 6, type: 'axis', id: 1 }                 - rls
+
+{ time: 1105856, value: 32767, number: 6, type: 'axis', id: 1 }    DPAD rt - push
+{ time: 1106048, value: 0, number: 6, type: 'axis', id: 1 }                  rls
 
 
 
+---- Wireless Xbox 360 GC ----
 
+iqdean@hpdm4:~/u1404/DEV-SW/github/node-joystick$ node joystick.js
+{ time: 4294842772,
+  value: 0,
+  number: 0,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 4294842796,
+  value: 0,
+  number: 1,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 4294842796,
+  value: 0,
+  number: 2,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 4294842796,
+  value: 0,
+  number: 3,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 4294842796,
+  value: 0,
+  number: 4,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 4294842796,
+  value: 0,
+  number: 5,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 4294842796,
+  value: 0,
+  number: 6,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 4294842800,
+  value: 0,
+  number: 7,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 4294842800,
+  value: 0,
+  number: 8,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 4294842800,
+  value: 0,
+  number: 9,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 4294842800,
+  value: 0,
+  number: 10,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 4294842800,
+  value: 0,
+  number: 11,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 4294842800,
+  value: 0,
+  number: 12,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 4294842800,
+  value: 0,
+  number: 13,
+  init: true,
+  type: 'button',
+  id: 1 }
+{ time: 4294842800,
+  value: 0,
+  number: 14,
+  init: true,
+  type: 'button',
+  id: 1 }
+------------------------- [0-14] 'button' = 15 buttons -----------
+{ time: 4294842800,
+  value: 0,
+  number: 0,
+  init: true,
+  type: 'axis',
+  id: 1 }
+{ time: 4294842800,
+  value: 0,
+  number: 1,
+  init: true,
+  type: 'axis',
+  id: 1 }
+{ time: 4294842804,
+  value: -32767,
+  number: 2,
+  init: true,
+  type: 'axis',
+  id: 1 }
+{ time: 4294842804,
+  value: 0,
+  number: 3,
+  init: true,
+  type: 'axis',
+  id: 1 }
+{ time: 4294842804,
+  value: 0,
+  number: 4,
+  init: true,
+  type: 'axis',
+  id: 1 }
+{ time: 4294842804,
+  value: -32767,
+  number: 5,
+  init: true,
+  type: 'axis',
+  id: 1 }
 
+-------- [0 - 5] 'axis' = 6 axis's ----------
 
+{ time: 121132, value: 1, number: 13, type: 'button', id: 1 }    DPAD Up Pushed
+{ time: 121316, value: 0, number: 13, type: 'button', id: 1 }            Released
 
+{ time: 124348, value: 1, number: 14, type: 'button', id: 1 }    DPAD Dwn Pushed
+{ time: 124524, value: 0, number: 14, type: 'button', id: 1 }             Released
 
+{ time: 126484, value: 1, number: 11, type: 'button', id: 1 }    DPAD Left Pushed
+{ time: 126604, value: 0, number: 11, type: 'button', id: 1 }
 
-
+{ time: 128448, value: 1, number: 12, type: 'button', id: 1 }    DPAD Right Pushed
+{ time: 128604, value: 0, number: 12, type: 'button', id: 1 }
 

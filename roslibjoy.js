@@ -1,5 +1,28 @@
-// REFS:
+// Big Picture
 
+// xbox360 Game Controller
+//    |
+//   usb
+//    |
+// u1404 notebook  <---usb eth cable---> Robot ECU1 (Edison)
+//
+//    xbox inputs
+//       |
+//    npm* joystick                            roscore
+//       |
+//  roslibjoy.js  reads joystick
+//       |        & publishes
+//     /cmd_vel     /cmd_vel
+//       |
+//    npm* roslib  ---- websocket ----->  rosbridge-server
+//                                                |
+//                                             /cmd_vel
+//                                                |
+//                                        robot_base_controller
+//
+//  *npm - designates a node package
+
+// REFS:
 // joystick.js = Node.js module for reading joystick data under Linux
 // [1] https://github.com/nodebits/linux-joystick
 // [2] https://github.com/JayBeavers/node-joystick
@@ -11,21 +34,22 @@
 
 // [1] joystick.js
 //   $ npm install joystick
-//     Set a deadzone of +/-3500 (out of +/-32k) and a sensitivty of 350 to reduce signal noise in joystick axis 
+//     Set a deadzone of +/-3500 (out of +/-32k) and a sensitivty of 350 to reduce signal noise in joystick axis
 
-// [4] xbox360 GC Mappings 
+// [4] xbox360 GC Mappings
 //
-// Current Usage 
+// Current Usage
 //
-// Saftey Button - DPAD Up Button 13 - HOLD PUSHED TO DRIVE
-// { time: 16346348, value: 0, number: 13, type: 'button', id: 1 }
+// Saftey Button - LB Button 4 - HOLD PUSHED TO DRIVE
+// { time: 27388336, value: 1, number: 4, type: 'button', id: 1 }  LB (Left Brake)
+// { time: 27388480, value: 0, number: 4, type: 'button', id: 1 }
 //                    |
 //                    |   safety    throttle
 //                    0 - enabled   disabled ( kills throttle control if u release the safety button)
 //                    1 - disabled  enabled  ( push and hold pushed to enable the throttle)
 //
 // Throttle - Right JoyStick
-// 
+//
 //                 +1 Full Fwd  -32767
 //                                                       up
 //                                   left       right     |
@@ -37,21 +61,22 @@
 // 3 [IAD] roslibjoy.js = 3-node-roslib-example/node-simple.js + 4-2-node-joystick/joystick.js
 //   Add roslib to joystick.js to publish /cmd_vel thru roslib to robot running rosbridge-server
 //
-//   $ npm install roslib   
+//   $ npm install roslib
 //     NOTE: For prereqs needed to get this working see intel-edison/8-5-node-xbox-gamepad.txt
 
-
+// Set a deadzone of +/-3500 (out of +/-32k) and a sensitivty of 350 to reduce signal noise in joystick axis
+// id = 1 means use /dev/input/js1      id  -deadzone-
 var joystick = new (require('joystick'))(1, 3500, 350);
 var ROSLIB = require('roslib');
 
 // following 3 variables get updated by joystick event handlers (aka callbacks)
-var safety = 'disabled';  
-var CV = parseFloat(0);               // these 2 vars get sampled and published to ros as /cmd_vel message 
+var safety = 'disabled';
+var CV = parseFloat(0);               // these 2 vars get sampled and published to ros as /cmd_vel message
 var CAV = parseFloat(0);              // on a periodic basis... lets use 10hz for now
 
 var ros = new ROSLIB.Ros({
     //url : 'ws://localhost:9090'
-    url : 'ws://192.168.2.15:9090'
+    url : 'ws://192.168.2.15:9090'   // websocket of rosbridge-server on robot
 });
 
 var cmdVel = new ROSLIB.Topic({
@@ -79,7 +104,7 @@ function publishToROS() {
 
     // CV and CAV have to be a float otherwise u get a ROS type error on the other end
 
-    // [ERROR] [WallTime: 946686132.737454] [Client 3] [id: publish:/cmd_vel:16] publish: 
+    // [ERROR] [WallTime: 946686132.737454] [Client 3] [id: publish:/cmd_vel:16] publish:
     //         geometry_msgs/Twist message requires a float64 for field linear.x, but got a <type 'unicode'>
 
     // SO, outside the ROSLIB.Message() function, use parseFloat(CV CAV) to set CV/CAV to a float value
@@ -97,12 +122,12 @@ setInterval(publishToROS, 100);  // 1000ms = 1hz (debug), 100ms = 10hz (actual)
 
 joystick.on('button', function(event) {
 
-    if (event.number === 13 && event.value === 1) {
+    if (event.number === 4 && event.value === 1) {
 	safety = 'disabled';
 	console.log('safety : ', safety, ' throttle engaged');
     }
 
-    if (event.number === 13 && event.value === 0) {
+    if (event.number === 4 && event.value === 0) {
 
 	safety = 'enabled';
 	console.log('safety : ', safety, ' throttle disabled');
@@ -140,4 +165,3 @@ console.log('Error connecting to websocket server: ', error);
 ros.on('close', function() {
 console.log('Connection to websocket server closed.');
 });
-
