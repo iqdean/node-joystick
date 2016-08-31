@@ -71,12 +71,24 @@ var ROSLIB = require('roslib');
 
 // following 3 variables get updated by joystick event handlers (aka callbacks)
 var safety = 'disabled';
-var CV = parseFloat(0);               // these 2 vars get sampled and published to ros as /cmd_vel message
-var CAV = parseFloat(0);              // on a periodic basis... lets use 10hz for now
+// these 2 vars get sampled and published to ros as /cmd_vel msg at 10hz
+var CV = parseFloat(0);    // CV = Commanded Linear Vel about X (+fwd) axis of robot in m/s
+var CAV = parseFloat(0);   // CAV= Commanded Angular Vel about Z (+ lft - rt turn) in rad/s
+
+// joystick fullscale inputs (-32767 0 +32767) are normalized/scaled to (-1 0 +1)
+// based on your robots geometry (wheel dia, track width, wheel encoder resolution)
+// (-1 0 +1) CV & CAV may produce unsafe (ex too fast) or too slow motion in response to
+// joystick inputs. So, the following 2 parameters are used to scale the normalized 
+// joystick inputs to produce desired linear and angular velocity ranges
+
+var CV_SF = 0.75;  // fullscale joystick inputs result in  +/- 0.75 m/s   linear velocity
+var CAV_SF= 1.5;   // fullscale joystick inputs result in  +/- 1.5  rad/s angular velocity 
+
 
 var ros = new ROSLIB.Ros({
     //url : 'ws://localhost:9090'
-    url : 'ws://192.168.2.15:9090'   // websocket of rosbridge-server on robot
+    //url : 'ws://192.168.2.15:9090'   // websocket of rosbridge-server on robot via usb eth
+    url : 'ws://10.0.0.157:9090'       // websocket via wifi
 });
 
 var cmdVel = new ROSLIB.Topic({
@@ -142,12 +154,12 @@ joystick.on('axis', function(event) {
 
     if (safety === 'disabled' ) {
 
-	if (event.type === 'axis' && event.number === 3) {
-	    CAV = intToFloat(event.value/32768, 2);
+	if (event.type === 'axis' && event.number === 3) {     // right hand rule about z
+	    CAV = intToFloat(CAV_SF*(event.value/-32768), 2);  // +left -rt turn
 	}
 
 	if (event.type === 'axis' && event.number === 4) {
-	    CV = intToFloat(event.value/-32768, 2);
+	    CV = intToFloat(CV_SF*(event.value/-32768), 2);
 	    //console.log(' CV ', CV);
 	}
     }
