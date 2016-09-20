@@ -36,7 +36,7 @@
 //   $ npm install joystick
 //     Set a deadzone of +/-3500 (out of +/-32k) and a sensitivty of 350 to reduce signal noise in joystick axis
 
-// [4] xbox360 GC Mappings
+// [4] Wireless xbox360 GC Mappings
 //
 // Current Usage
 //
@@ -65,8 +65,9 @@
 //     NOTE: For prereqs needed to get this working see intel-edison/8-5-node-xbox-gamepad.txt
 
 // Set a deadzone of +/-3500 (out of +/-32k) and a sensitivty of 350 to reduce signal noise in joystick axis
-// id = 1 means use /dev/input/js1      id  -deadzone-
-var joystick = new (require('joystick'))(1, 3500, 350);
+// id = 1 means use /dev/input/js1      id  -deadzone- 
+// var joystick = new (require('joystick'))(1, 3500, 350);  << on hpdm4 joystick shows up as js1
+var joystick = new (require('joystick'))(0, 3500, 350);
 var ROSLIB = require('roslib');
 
 // following 3 variables get updated by joystick event handlers (aka callbacks)
@@ -87,8 +88,8 @@ var CAV_SF= 1.5;   // fullscale joystick inputs result in  +/- 1.5  rad/s angula
 
 var ros = new ROSLIB.Ros({
     //url : 'ws://localhost:9090'
-    //url : 'ws://192.168.2.15:9090'   // websocket of rosbridge-server on robot via usb eth
-    url : 'ws://10.0.0.157:9090'       // websocket via wifi
+    url : 'ws://192.168.2.15:9090'   // websocket of rosbridge-server on robot via usb eth
+    //url : 'ws://10.0.0.157:9090'       // websocket via wifi
 });
 
 var cmdVel = new ROSLIB.Topic({
@@ -130,7 +131,7 @@ function publishToROS() {
     cmdVel.publish(twist);
 }
 
-setInterval(publishToROS, 100);  // 1000ms = 1hz (debug), 100ms = 10hz (actual)
+setInterval(publishToROS, 50);  // 1000ms = 1hz (debug), 100ms = 10hz, 50ms = 20hz
 
 joystick.on('button', function(event) {
 
